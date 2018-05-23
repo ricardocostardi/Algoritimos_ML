@@ -1,6 +1,6 @@
 import math, random
 from collections import defaultdict, Counter
-from linear_algebra import dot
+
 
 
 """
@@ -32,3 +32,40 @@ users_interests = [
     ["databases", "HBase", "Postgres", "MySQL", "MongoDB"],
     ["libsvm", "regression", "support vector machines"]
 ]
+
+
+# Irei recomendar interesses para um usuario baseado em interesses em commun
+# com outros usuarios
+
+# Primeiro irei ordenar os interesses, e atribuir um indice para casa
+# interesse unico
+
+unique_interests = sorted(list({ interest 
+                                  for users_interests in users_interests
+                                  for interest in users_interests  }))
+
+
+"""
+
+Agora temos que saber em que cada um dos usuarios estão interessados
+irei fazer uma função para interar sobre os interesses dos usuarios 
+e me retornar um vetor com 1s e 0s sendo 1 o usuario tem interesse naquele
+assunto e 0 não tem
+
+"""
+
+def make_user_interest_vector(users_interests):
+    return [1 if interest in users_interests else 0
+            for interest in unique_interests]
+
+"""
+
+Agora que tenho essa função, posso criar uma matrix de interesses dos usuarios
+utilizando mapping
+
+"""    
+
+user_interest_matrix = list(map(make_user_interest_vector, users_interests))   
+
+print(user_interest_matrix)   
+                               
