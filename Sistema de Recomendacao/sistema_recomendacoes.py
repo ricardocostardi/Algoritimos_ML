@@ -177,7 +177,7 @@ def user_based_suggestions(user_id):
 
 
 
-print(user_based_suggestions(6))
+#print(user_based_suggestions(6))
        
 
 """
@@ -210,3 +210,65 @@ com base nos interesses similares aos interesses dele no momento
 
 # Interesses baseados nos itens
 
+# Transpondo a matriz de interesses, dessa forma as colunas seram os usuarios
+# e as linhas os interesses
+
+interest_user_matrix = [[make_user_interest_vector[j]
+                         for make_user_interest_vector in user_interest_matrix]
+                        for j, _ in enumerate(unique_interests)]
+
+
+# Agora utilizando essa matriz, podemos usar a similariedade do cosseno novamente
+# para descobrir se os mesmos usuarios estão interessados no mesmo topico, com isso
+# sua similariedade será 1.
+
+interest_similarities = [[cosine_similarity(user_vector_i, user_vector_j)
+                          for user_vector_j in interest_user_matrix]
+                         for user_vector_i in interest_user_matrix]                         
+
+
+
+
+"""
+
+Agora defino uma função que dado um interesse me retorne os interesses similares
+
+"""                         
+
+def most_similar_interest_to(interest_id):
+    similarities = interest_similarities[interest_id]
+    pairs = [(unique_interests[other_interest_id], similarity)
+             for other_interest_id, similarity in enumerate(similarities)
+             if interest_id != other_interest_id and similarity > 0]
+    return sorted(pairs, key=lambda pair: pair[1], reverse=True)         
+
+# Agora podemos sugerir itens de interesse baseado em outros interesses baseados com
+# os dele.
+
+
+def item_based_suggestions(user_id):
+
+    # somatorio dos interesses similares
+    suggestions = defaultdict(float)
+    make_user_interest_vector = user_interest_matrix[user_id]
+    for interest_id, is_interested in enumerate(make_user_interest_vector):
+        if is_interested == 1:
+            similar_interests = most_similar_interest_to(interest_id)
+            for interest, similarity in similar_interests:
+                suggestions[interest] += similarity
+
+    suggestions = sorted(suggestions.items(),
+                         key=lambda pair: pair[1],
+                         reverse=True)            
+
+    return [(suggestion, weight)
+            for suggestion, weight in suggestions
+            if suggestion not in users_interests[user_id]]
+
+
+print("recomendação baseada em itens")
+print("similares a  'Big Data'")
+print(most_similar_interest_to(0))
+print()
+print("Sugestões para o usuario  0")
+print(item_based_suggestions(0))                    
