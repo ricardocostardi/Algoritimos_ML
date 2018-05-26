@@ -144,8 +144,69 @@ def most_similar_users_to(user_id):
 
     return sorted(pairs, key=lambda pair: pair[1], reverse=True)    
 
-print(most_similar_users_to(0))
+"""
+
+Agora e só fazer uma fuñção que dado um usuario, retorne sugestões
+para o mesmo baseado em interresses em comum com outros usuarios.
+
+Essa função ira receber um id de usuario, dentro dela iremos chamar
+a função most_similiar_user_to passando o mesmo id.
+Após pegamos essa lista de todos os interesses dos usuarios similares
+ao usuario do qual passamos o ID, e exibimos uma lista com os interesses 
+que não estão nos interesses do usuario ainda, como sugestão.
+
+"""
+
+def user_based_suggestions(user_id):
+    suggestions = defaultdict(float)
+    for other_user_id, similarity in most_similar_users_to(user_id):
+        for interest in users_interests[other_user_id]:
+            suggestions[interest] += similarity
+
+# ordenando a lista de sugestões
+    
+    suggestions = sorted(suggestions.items(), 
+                         key=lambda pair: pair[1], 
+                         reverse=True)
+    
+# só retorno na lista sugestões novas
+
+    return [(suggestion, weight)
+            for suggestion, weight in suggestions
+            if suggestion not in users_interests[user_id]]
 
 
 
-         #...continua
+print(user_based_suggestions(6))
+       
+
+"""
+
+No caso do print acima, estamos pegando o usuario com ID 6
+que é a 7º linha na nossa lista lá de cima com os interesses dos usuarios
+esse usuario tem os seguintes interesses de acordo com aquela lista:
+
+ ["statistics", "probability", "mathematics", "theory"],
+
+ E no algoritmo de sugestão está sugerindo os seguintes interesses para ele:
+
+ [('R', 0.7358887300947708),
+  ('Python', 0.4472135954999579), 
+  ('regression', 0.4472135954999579),
+  ('statsmodels', 0.2886751345948129),
+  ('C++', 0.25), ('deep learning', 0.25),
+  ('artificial intelligence', 0.25)]
+
+São sugestões muito boas para quem tem interrese em estatistica.  
+
+Porém se a base for muito grande pode ocorrer de começar a ter sugestões
+que não são muito haver com o usuario, para evitar isso irei fazer um algoritimo que
+realiza a recomendação baseado nos interesses diretamente, são se apegar a outros usuarios
+ou seja iremos agrupar os interesses similares e sugerir novos interesses para o usuarios
+com base nos interesses similares aos interesses dele no momento
+
+"""
+
+
+# Interesses baseados nos itens
+
